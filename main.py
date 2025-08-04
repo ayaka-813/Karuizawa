@@ -5,7 +5,7 @@ import pandas as pd
 app = FastAPI()
 
 # CSV読み込み
-timetable_df = pd.read_csv("bus_timetable.csv", encoding="shift_jis")
+timetable_df = pd.read_csv("bus_timetable2.csv", encoding="shift_jis")
 
 def get_times_for_stop(bus_stop_name):
     row = timetable_df[timetable_df["stop_name"] == bus_stop_name]
