@@ -4,15 +4,14 @@ import pandas as pd
 
 app = FastAPI()
 
-# CSVファイルを読み込む（ファイル名はご自身のものに合わせてください）
+# CSV読み込み
 timetable_df = pd.read_csv("bus_timetable.csv", encoding="shift_jis")
 
 def get_times_for_stop(bus_stop_name):
     row = timetable_df[timetable_df["stop_name"] == bus_stop_name]
     if row.empty:
         return None
-    times = row.iloc[0, 2:].dropna().tolist()
-    return times
+    return row.iloc[0, 2:].dropna().tolist()
 
 @app.get("/bus_info")
 def get_bus_info(
@@ -20,15 +19,14 @@ def get_bus_info(
     bus_stop: str = Query(...),
     current_time: str = Query(...)
 ):
-    # 現在時刻の形式チェック
     try:
         now = datetime.fromisoformat(current_time.replace("Z", "+00:00"))
     except ValueError:
-        return {"message": "現在時刻の形式が正しくありません（ISO 8601形式で渡してください）"}
+        return {"message": "現在時刻の形式が正しくありません（ISO形式）"}
 
     times = get_times_for_stop(bus_stop)
     if not times:
-        return {"message": f"{bus_stop} の時刻表データが見つかりませんでした。"}
+        return {"message": f"{bus_stop} の時刻表が見つかりませんでした。"}
 
     next_bus = None
     minutes_left = None
@@ -45,7 +43,7 @@ def get_bus_info(
             continue
 
     if not next_bus:
-        return {"message": f"{bus_stop} から出る本日のバスは終了しました。"}
+        return {"message": f"{bus_stop} から出るバスは本日は終了しました。"}
 
     return {
         "destination": destination,
